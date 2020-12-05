@@ -5,7 +5,7 @@
 #include <sstream>
 #include <map>
 #include <regex>
-
+#include <cstring>
 
 int main(){
     // Input file
