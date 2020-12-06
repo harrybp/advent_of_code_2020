@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# Get commands
+x=$(find . -name "*.cpp" | sed 's/.cpp//g' | sed 's/\.\///g' | sort)
+
+for file in $x; do
+    IFS='/'
+    read -ra PARTS <<< "$file"
+    IFS=''
+    echo "-- ${PARTS[0]} -- ${PARTS[1]} --"
+    cd ${PARTS[0]}
+    ./${PARTS[1]}
+    cd ..
+done
