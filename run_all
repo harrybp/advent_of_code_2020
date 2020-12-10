@@ -3,12 +3,23 @@
 # Get commands
 x=$(find . -name "*part*.cpp" | sed 's/.cpp//g' | sed 's/\.\///g' | sort)
 
+# Print header
+echo "+------+-------+-------+----------------"
+echo "| Part | Lines | Time  | Output"
+echo "+------+-------+-------+----------------"
+
+# Loop over files
 for file in $x; do
     IFS='/'
     read -ra PARTS <<< "$file"
     IFS=''
-    echo "-- ${PARTS[0]} -- ${PARTS[1]} --"
     cd ${PARTS[0]}
-    ./${PARTS[1]}
+
+    day_no=`echo ${PARTS[0]} |sed 's/day_//g'`
+    part_no_and_lines=`wc -l ${PARTS[1]} | sed 's/.cpp//g' | sed 's/part//g' | awk '{printf "%1s | %5d | ", $2, $1;}'`
+    time_and_output=`( time ./${PARTS[1]} ) 2>&1 | tr '\n' ' ' | sed 's/user.*//g' | sed 's/real[\s|\t| ]*//g' | sed 's/0m0//g' | awk '{x=$NF;$NF="";print x " | " $0};'`
+    echo "| ${day_no}.${part_no_and_lines}${time_and_output}"
+
     cd ..
 done
+echo "+------+-------+-------+----------------"
