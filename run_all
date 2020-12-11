@@ -16,7 +16,7 @@ for file in $x; do
     cd ${PARTS[0]}
 
     day_no=`echo ${PARTS[0]} |sed 's/day_//g'`
-    part_no_and_lines=`wc -l ${PARTS[1]} | sed 's/.cpp//g' | sed 's/part//g' | awk '{printf "%1s | %5d | ", $2, $1;}'`
+    part_no_and_lines=`wc -l ${PARTS[1]}.cpp | sed 's/.cpp//g' | sed 's/part//g' | awk '{printf "%1s | %5d | ", $2, $1;}'`
     time_and_output=`( time ./${PARTS[1]} ) 2>&1 | tr '\n' ' ' | sed 's/user.*//g' | sed 's/real[\s|\t| ]*//g' | sed 's/0m0//g' | awk '{x=$NF;$NF="";print x " | " $0};'`
     echo "| ${day_no}.${part_no_and_lines}${time_and_output}"
 
