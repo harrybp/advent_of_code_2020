@@ -14,19 +14,6 @@ struct Node {
 
 std::vector<Node> nodes;
 
-// Print out a node's ID and children
-void printNode(Node node){
-    printf("%d : %s :\nA: ",node.id, node.value.c_str());
-    for(int i = 0; i < node.childrenA.size(); i++){
-        printf("%d, ", node.childrenA[i]);
-    }
-    printf("\nB: ");
-    for(int i = 0; i < node.childrenB.size(); i++){
-        printf("%d, ", node.childrenB[i]);
-    }
-    printf("\n\n");
-}
-
 // Get all the possible strings which match a given NODE recursively
 std::vector<std::string> getAllCombos(int nodeID){
     Node node = nodes[nodeID];
@@ -41,10 +28,10 @@ std::vector<std::string> getAllCombos(int nodeID){
     // Recursive case
     std::vector<std::string> recursiveCombos;
     std::vector<std::string> newRecursiveCombos;
-    for(int i = 0; i < 2; i++){
+    for(int n = 0; n < 2; n++){
 
         // For each set of children
-        std::vector<int> children = (i == 0)? node.childrenA : node.childrenB;
+        std::vector<int> children = (n == 0)? node.childrenA : node.childrenB;
         if(!children.empty()){
             recursiveCombos.push_back("");
 
@@ -63,6 +50,7 @@ std::vector<std::string> getAllCombos(int nodeID){
                 newRecursiveCombos.clear();
             }
         }
+        if(recursiveCombos.size() > 0)
         combos.insert(combos.end(), recursiveCombos.begin(), recursiveCombos.end());
         recursiveCombos.clear();
     }
@@ -106,6 +94,44 @@ Node parseNode(std::string inputText){
     return newNode;
 }
 
+// All combinations for rules 42 and 31
+std::vector<std::string> all42s;
+std::vector<std::string> all31s;
+
+// Check if a string exactly matches rule 42 or 31
+bool is42(std::string message){
+    return std::find(all42s.begin(), all42s.end(), message) != all42s.end();
+}
+bool is31(std::string message){
+    return std::find(all31s.begin(), all31s.end(), message) != all31s.end();
+}
+
+// Check if a string has 2 42's followed by one 31
+bool checkMatch(std::string message, int count42){
+
+    // Recursive case
+    int index = 0;
+    while(index <= message.size()){
+        std::string possible42 = message.substr(0, index);
+        if(is42(possible42)){
+            std::string remainingString = message.substr(index, message.size());
+
+
+            // If this is the second 42, next must be a 31
+            if((count42 == 1) && (is31(remainingString))){
+                return true;
+            }
+
+            // Else, we need another 31
+            if((count42 < 1) && (checkMatch(remainingString, count42+1))){
+                return true;
+            }
+        }
+        index++;
+    }
+    return false;
+}
+
 int main(){
     // Initialise nodes vector
     int numberOfNodes = 150;
@@ -134,16 +160,17 @@ int main(){
     }
     inputFile.close();
 
-    // Check each message against the list of all possible messages
-    std::vector<std::string> allCombos = getAllCombos(0);
-    std::sort(allCombos.begin(), allCombos.end());
+    // Get all the possible combinations for rules 42 and 31
+    all42s = getAllCombos(42);
+    all31s = getAllCombos(31);
+
+    // Check each message
     int matches = 0;
     for(int j = 0; j < messages.size(); j++){
-        if(std::binary_search(allCombos.begin(), allCombos.end(), messages[j])){
+        if(checkMatch(messages[j],0)){
             matches++;
         }
     }
-    printf("%d messages match\n", matches);
+    printf("%d / %lu messages match\n", matches, messages.size());
     return 1;
 }
-
